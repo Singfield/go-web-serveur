@@ -1,17 +1,16 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
-	"io"
 	"log"
 	"net"
 )
-// ici on construit un serveur web tcp la couche en dessous de Http
-// sur lequel on construira de quoi retourner des réponses formatté en hypertext protocol ( http)
+
+// tcp serv
 func main() {
-	// ici on accept toutes sort de connection en tcp sur le port 8080
-	// on verra plus tard pour la reponse etc...
-	// Listen(" quel type de connection, le port")
+
+	// Listen, Accept, read and write to the connection ;)
 	li, err := net.Listen("tcp", ":8080")
 	if err != nil {
 		log.Panic(err)
@@ -24,10 +23,20 @@ func main() {
 		if err != nil {
 			log.Println()
 		}
-		io.WriteString(conn, "\nHello from TCP server\n")
-		fmt.Fprintln(conn, "How is your day ?")
-		fmt.Fprintln(conn, "%v", "well, I hope!")
-		conn.Close()
+		// goroutine for handle many connection
+		go handle(conn)
 	}
 
+}
+
+func handle(conn net.Conn) {
+
+	scanner := bufio.NewScanner(conn)
+	// pb inifite loop
+	for scanner.Scan() {
+		ln := scanner.Text()
+		fmt.Println(ln)
+		// when stop listenning ?
+	}
+	defer conn.Close()
 }
